@@ -1,0 +1,17 @@
+[install]
+# Configure package manager
+registry = "https://registry.npmjs.org/"
+cache = false
+
+[test]
+# Test configuration
+preload = ["./tests/setup.ts"]
+timeout = 5000
+
+[build]
+# Build configuration
+target = "bun"
+format = "esm"
+splitting = true
+minify = false
+sourcemap = "external"
