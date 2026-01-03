@@ -1,8 +1,13 @@
 // Main entry point for the Universal Compiler Framework
 
-// Export all types and interfaces
+// Export all types
 export * from "./types/index";
-export * from "./interfaces/index";
+
+// Export interfaces (types)
+export type * from "./interfaces/index";
+
+// Export core implementations (classes)
+export { Lexer, TokenStream } from "./core/index";
 
 // Framework version
 export const VERSION = "1.0.0";

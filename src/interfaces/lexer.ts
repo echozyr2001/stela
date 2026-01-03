@@ -4,11 +4,28 @@ import { Token, Position, ValidationResult } from "../types/index";
 
 /**
  * Configuration for lexical analysis
+ *
+ * The framework provides minimal built-in behavior - all token recognition
+ * is done through user-defined rules. Configuration options are just
+ * convenience features for common cases.
  */
 export interface LexerConfig {
   rules: TokenRule[];
-  skipWhitespace?: boolean;
-  preserveComments?: boolean;
+  /**
+   * Optional convenience: Skip whitespace characters before matching rules.
+   * Can be:
+   * - `true`: Skip all whitespace characters (common default)
+   * - `false`: Don't skip any whitespace, handle them through token rules
+   * - `RegExp`: Skip whitespace characters that match this pattern
+   *
+   * If not specified, defaults to `true`. Users can also define whitespace
+   * tokens through rules if they need fine-grained control.
+   */
+  skipWhitespace?: boolean | RegExp;
+  /**
+   * Case sensitivity for pattern matching. Defaults to `true`.
+   * Users can also control this per-rule through regex flags.
+   */
   caseSensitive?: boolean;
 }
 
