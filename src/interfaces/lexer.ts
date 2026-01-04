@@ -30,11 +30,24 @@ export interface LexerConfig {
 }
 
 /**
+ * Pattern matcher function that attempts to match at a given offset
+ * @param source - The entire source code string
+ * @param offset - The current offset to start matching from
+ * @returns The matched text if successful, or null if no match
+ */
+export type PatternMatcher = (source: string, offset: number) => string | null;
+
+/**
  * Token rule definition with pattern and precedence
+ *
+ * Pattern can be:
+ * - `RegExp`: Regular expression pattern (compiled with ^ anchor)
+ * - `string`: Literal string pattern (automatically escaped)
+ * - `PatternMatcher`: Function for complex matching logic that cannot be expressed as regex
  */
 export interface TokenRule {
   type: string;
-  pattern: RegExp | string;
+  pattern: RegExp | string | PatternMatcher;
   precedence?: number;
   action?: (match: string, position: Position) => Token | null;
 }

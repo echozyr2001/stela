@@ -79,14 +79,26 @@ export class Lexer implements ILexer {
       // Try to match each rule (all token recognition is done through user-defined rules)
       let matched = false;
       for (const rule of this.rules) {
-        const pattern = this.compilePattern(rule.pattern);
-        const remaining = source.slice(offset);
-        const match = remaining.match(pattern);
+        let matchedText: string | null = null;
 
-        // match.index is 0 for patterns starting with ^, or undefined for global matches
-        // Since we use ^ anchor, we just check if match exists
-        if (match && match[0]) {
-          const matchedText = match[0];
+        // Handle different pattern types
+        if (typeof rule.pattern === "function") {
+          // Function pattern matcher
+          matchedText = rule.pattern(source, offset);
+        } else {
+          // RegExp or string pattern
+          const pattern = this.compilePattern(rule.pattern);
+          const remaining = source.slice(offset);
+          const match = remaining.match(pattern);
+
+          // match.index is 0 for patterns starting with ^, or undefined for global matches
+          // Since we use ^ anchor, we just check if match exists
+          if (match && match[0]) {
+            matchedText = match[0];
+          }
+        }
+
+        if (matchedText) {
           const startPosition: Position = {
             line,
             column,
@@ -194,8 +206,13 @@ export class Lexer implements ILexer {
       }
     }
 
-    // Validate pattern compilation
+    // Validate pattern compilation (only for RegExp and string patterns)
     for (const rule of this.rules) {
+      if (typeof rule.pattern === "function") {
+        // Function patterns cannot be validated at compile time
+        continue;
+      }
+
       try {
         this.compilePattern(rule.pattern);
       } catch (error) {
@@ -216,7 +233,7 @@ export class Lexer implements ILexer {
 
   /**
    * Compile a pattern (string or RegExp) into a RegExp with proper flags
-   * @param pattern - Pattern to compile (string or RegExp)
+   * @param pattern - Pattern to compile (string or RegExp, not function)
    * @returns Compiled RegExp with ^ anchor for start-of-string matching
    */
   private compilePattern(pattern: RegExp | string): RegExp {
